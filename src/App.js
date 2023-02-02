@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import AddMovie from "./components/AddMovie";
+import AddPost from "./components/AddPost";
 
 import PostList from "./components/PostList";
 import "./App.css";
@@ -42,9 +42,13 @@ function App() {
         fetchPostsHandler();
     }, [fetchPostsHandler]);
 
+    const addPosthandler = (postData) => {
+        console.log(postData);
+    };
+
     return (
         <React.Fragment>
-            <AddMovie></AddMovie>
+            <AddPost onAddPost={addPosthandler}></AddPost>
             <section>
                 <button onClick={fetchPostsHandler}>Fetch Posts</button>
             </section>
