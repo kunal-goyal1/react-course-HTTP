@@ -1,30 +1,54 @@
-import React from "react";
+import React, { useState, useEffect, useCallback } from "react";
+import AddMovie from "./components/AddMovie";
 
 import PostList from "./components/PostList";
 import "./App.css";
 
 function App() {
-    const dummyPosts = [
-        {
-            id: Math.random().toString(),
-            title: "Some Dummy Post",
-            body: "This is a great Post 1",
-        },
-        {
-            id: Math.random().toString(),
-            title: "Some Dummy Post2",
-            body: "This is a great Post 2",
-        },
-    ];
+    const [posts, setPosts] = useState([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [error, setError] = useState(null);
+
+    let content = <p>found no posts</p>;
+    if (posts.length > 0) {
+        content = <PostList posts={posts} />;
+    }
+    if (error) {
+        content = <p>something went wrong</p>;
+    }
+    if (isLoading) {
+        content = <p>loading...</p>;
+    }
+
+    const fetchPostsHandler = useCallback(async () => {
+        try {
+            setIsLoading(true);
+            setError(null);
+            const response = await fetch(
+                "https://jsonplaceholder.typicode.com/posts"
+            );
+            if (!response.ok) {
+                throw new Error("something went wrong");
+            }
+            const data = await response.json();
+            setPosts(data);
+        } catch (error) {
+            setError(error.message);
+        }
+        setIsLoading(false);
+    }, []);
+
+    useEffect(() => {
+        fetchPostsHandler();
+    }, [fetchPostsHandler]);
 
     return (
         <React.Fragment>
+            <AddMovie></AddMovie>
             <section>
-                <button>Fetch Posts</button>
+                <button onClick={fetchPostsHandler}>Fetch Posts</button>
             </section>
-            <section>
-                <PostList posts={dummyPosts} />
-            </section>
+            <section>{content}</section>
         </React.Fragment>
     );
 }
